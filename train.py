@@ -20,27 +20,17 @@ from parameters import *
 def get_cars_dictionaries(directory: str):
     annotation_filename = os.path.join(directory, NAME_ANNOTATION_FILE)
     if not os.path.isfile(annotation_filename):
-        print("[ERROR] File not found!")
+        print(f"[ERROR] File {annotation_filename} not found!")
         return []
     with open(annotation_filename) as file:
         image_annotations = json.load(file)
     image_annotations = image_annotations['annotations']
     dataset_dictionary = []
     for idx, value in enumerate(image_annotations):
-        record_found = False
         if value['category_id'] == 3 and 'counts' not in value['segmentation']:
             image_filename = os.path.abspath(os.path.join(directory, value['file_name']))
-            for record in dataset_dictionary:
-                if image_filename in record.values():
-                    record['annotations'].append({
-                        "bbox": [int(v) for v in value['bbox']],
-                        "bbox_mode": BoxMode.XYWH_ABS,
-                        "segmentation": value['segmentation'],
-                        "category_id": 0
-                    })
-                    record_found = True
-                    break
-            if not record_found:
+            record = next((value for value in dataset_dictionary if value['file_name'] == image_filename), None)
+            if record is None:
                 height, width = cv2.imread(filename=image_filename).shape[:2]
                 record = dict()
                 record['file_name'] = image_filename
@@ -49,12 +39,19 @@ def get_cars_dictionaries(directory: str):
                 record['width'] = width
                 record['iscrowd'] = value['iscrowd']
                 record['annotations'] = [{
-                    "bbox": [int(v) for v in value['bbox']],
+                    "bbox": value['bbox'],
                     "bbox_mode": BoxMode.XYWH_ABS,
                     "segmentation": value['segmentation'],
                     "category_id": 0
                 }]
                 dataset_dictionary.append(record)
+            else:
+                record["annotations"].append({
+                    "bbox": value['bbox'],
+                    "bbox_mode": BoxMode.XYWH_ABS,
+                    "segmentation": value['segmentation'],
+                    "category_id": 0
+                })
     return dataset_dictionary
 
 
@@ -82,3 +79,6 @@ os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 trainer = DefaultTrainer(cfg)
 trainer.resume_or_load(resume=False)
 trainer.train()
+
+
+
