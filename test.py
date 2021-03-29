@@ -28,7 +28,7 @@ parser.add_argument('--show', dest='show_result', default=True, type=str2bool,
 args = parser.parse_args()
 folder = args.source_folder
 show = args.show_result
-print(show)
+
 # Configuration Model
 cfg = get_cfg()
 cfg.DATALOADER.NUM_WORKERS = 2

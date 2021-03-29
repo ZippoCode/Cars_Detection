@@ -15,6 +15,7 @@ from detectron2.utils.visualizer import Visualizer
 
 # Custom importing
 from parameters import *
+from utils import Trainer
 
 
 def get_cars_dictionaries(directory: str):
@@ -70,15 +71,15 @@ cfg.DATALOADER.NUM_WORKERS = 2
 cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
 cfg.SOLVER.IMS_PER_BATCH = 2
 cfg.SOLVER.BASE_LR = 0.00025
-cfg.SOLVER.MAX_ITER = 300
+cfg.SOLVER.MAX_ITER = 1000
 cfg.SOLVER.STEPS = []
 cfg.MODEL.ROI_HEADS.BATCH_SIZE_PER_IMAGE = 128
 cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
 
 os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
-trainer = DefaultTrainer(cfg)
-trainer.resume_or_load(resume=False)
-trainer.train()
-
-
-
+try:
+    trainer = Trainer(cfg)
+    trainer.resume_or_load(resume=False)
+    trainer.train()
+except KeyboardInterrupt:
+    print("Training stopped!")
