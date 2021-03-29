@@ -1,21 +1,16 @@
 import os
-import sys
 import json
 import cv2
 import torch
-import random
-import matplotlib.pyplot as plt
 
 from detectron2 import model_zoo
 from detectron2.config import get_cfg
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from detectron2.engine import DefaultTrainer
 from detectron2.structures import BoxMode
-from detectron2.utils.visualizer import Visualizer
 
 # Custom importing
 from parameters import *
-from utils import Trainer
 
 
 def get_cars_dictionaries(directory: str):
@@ -64,11 +59,11 @@ cars_metadata = MetadataCatalog.get("cars_train")
 # Training
 cfg = get_cfg()
 cfg.MODEL.DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
+cfg.merge_from_file(model_zoo.get_config_file(MODEL_ZOO_CONFIGURATION_FILE))
 cfg.DATASETS.TRAIN = ("cars_train",)
 cfg.DATASETS.TEST = ()
 cfg.DATALOADER.NUM_WORKERS = 2
-cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
+cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(MODEL_ZOO_CONFIGURATION_FILE)
 cfg.SOLVER.IMS_PER_BATCH = 2
 cfg.SOLVER.BASE_LR = 0.00025
 cfg.SOLVER.MAX_ITER = 1000
@@ -78,7 +73,7 @@ cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
 
 os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
 try:
-    trainer = Trainer(cfg)
+    trainer = DefaultTrainer(cfg)
     trainer.resume_or_load(resume=False)
     trainer.train()
 except KeyboardInterrupt:

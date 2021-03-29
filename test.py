@@ -57,6 +57,7 @@ if __name__ == '__main__':
     results = []
     try:
         images = get_images(folder)
+        count = 0
         for file in tqdm(images):
             im = cv2.imread(file['file_name'])
             outputs = predictor(im)
@@ -75,8 +76,10 @@ if __name__ == '__main__':
             if show:
                 v = Visualizer(im[:, :, ::-1], metadata=metadata, instance_mode=ColorMode.IMAGE_BW)
                 out = v.draw_instance_predictions(outputs["instances"].to("cpu"))
-                plt.imshow(out.get_image())
-                plt.show()
+                # plt.imshow(out.get_image())
+                # plt.show()
+                count += 1
+                cv2.imwrite(f"results/Result{count}.jpg", out.get_image()[:, :, ::-1])
     except KeyboardInterrupt:
         print("Process ended!")
 

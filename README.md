@@ -28,3 +28,11 @@ python test.py
 
 The algorithm is going to output a ```results.csv``` file with has two columns the first identifies the name of the image and the second the coordinate of 
 bounding boxes in format ```[height, width, px_center, py_center]```
+
+[comment]: <> (# Result)
+
+[comment]: <> (The two images show two examples:)
+
+[comment]: <> (![result_one]&#40;https://github.com/ZippoCode/Cars_Detection/blob/master/results/Result_1.jpg?raw=true=250x250&#41;)
+
+[comment]: <> (![result_two]&#40;https://github.com/ZippoCode/Cars_Detection/blob/master/results/Result_2.jpg?raw=true&#41;)
